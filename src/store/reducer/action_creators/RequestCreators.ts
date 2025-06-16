@@ -4,6 +4,7 @@ import {IUser} from "../../../models/IUser";
 import axios from "axios";
 import {RequestSlice} from "../RequestSlice";
 import {IRequest} from "../../../models/IRequest";
+import {UserSlice} from "../UserSlice";
 
 
 export const createRequest = (to_user_id: number) => async (dispatch: AppDispatch) => {
@@ -44,6 +45,18 @@ export const fetchOutgoingRequests = () => async (dispatch: AppDispatch) => {
         const {data} = await $authHost.get<IRequest[]>('/requests/outgoing')
 
         dispatch(RequestSlice.actions.allRequestsUsersFetchingSuccess(data))
+    } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+            dispatch(RequestSlice.actions.requestFetchingError(e.message));
+        } else {
+            dispatch(RequestSlice.actions.requestFetchingError('Unexpected error'));
+        }
+    }
+}
+
+export const filterRequests = (filterUser: IRequest[]) => (dispatch: AppDispatch) => {
+    try {
+        dispatch(RequestSlice.actions.allRequestsUsersFetchingSuccess(filterUser))
     } catch (e: unknown) {
         if (axios.isAxiosError(e)) {
             dispatch(RequestSlice.actions.requestFetchingError(e.message));
